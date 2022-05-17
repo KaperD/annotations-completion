@@ -57,6 +57,45 @@ class AnnotationUsage:
         return f'{self.annotation_name}'
 
 
+def load(method_usages,
+           max_new_columns=100,
+           size=10000,
+           train_fraction=0.8,
+           state=42,
+           need_polynomial=False):
+    method_usages = shuffle(method_usages, random_state=state)[:size]
+    raw_X = np.array([np.array(usage.features_list, dtype=object) for usage in method_usages])
+    X = None
+    all_new_names = []
+    if len(raw_X) == 0:
+        X = np.array([])
+        all_new_names = initial_feature_names
+    else:
+        for col in range(raw_X.shape[1]):
+            new_columns, new_names = encode_column(raw_X[:, col], round(len(raw_X[:, col]) * train_fraction),
+                                                   initial_feature_names[col], max_new_columns)
+            if new_columns is None:
+                continue
+            all_new_names += new_names
+            if X is None:
+                X = new_columns
+            else:
+                X = np.concatenate((X, new_columns), axis=1)
+    if need_polynomial and len(X) > 0:
+        sel = VarianceThreshold(threshold=0.01)
+        print(len(X[0]))
+        X = sel.fit_transform(X)
+        print(len(X[0]))
+        poly = PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)
+        X = poly.fit_transform(X)
+        print(len(X[0]))
+        sel = VarianceThreshold(threshold=0.01)
+        X = sel.fit_transform(X)
+        print(len(X[0]))
+    y = np.array([usage.annotation_name for usage in method_usages])
+    return X, y, all_new_names
+
+
 class UsagesLoader:
     def __init__(self, processing_result_path):
         usages_by_target = defaultdict(list)
@@ -79,6 +118,16 @@ class UsagesLoader:
             all_usages += value
         return all_usages
 
+    def load(self,
+             max_new_columns=100,
+             size=10000,
+             train_fraction=0.8,
+             state=42,
+             need_polynomial=False,
+             ignored_annotation=()):
+        method_usages = list(filter(lambda x: x.annotation_name not in ignored_annotation, self.load_all()))
+        return load(method_usages, max_new_columns, size, train_fraction, state, need_polynomial)
+
     def load_for_target(self,
                         target_type,
                         max_new_columns=100,
@@ -89,34 +138,4 @@ class UsagesLoader:
                         ignored_annotation=()):
         method_usages = list(
             filter(lambda x: x.annotation_name not in ignored_annotation, self.usages_by_target[target_type]))
-        method_usages = shuffle(method_usages, random_state=state)[:size]
-        raw_X = np.array([np.array(usage.features_list, dtype=object) for usage in method_usages])
-        X = None
-        all_new_names = []
-        if len(raw_X) == 0:
-            X = np.array([])
-            all_new_names = initial_feature_names
-        else:
-            for col in range(raw_X.shape[1]):
-                new_columns, new_names = encode_column(raw_X[:, col], round(len(raw_X[:, col]) * train_fraction),
-                                                       initial_feature_names[col], max_new_columns)
-                if new_columns is None:
-                    continue
-                all_new_names += new_names
-                if X is None:
-                    X = new_columns
-                else:
-                    X = np.concatenate((X, new_columns), axis=1)
-        if need_polynomial and len(X) > 0:
-            sel = VarianceThreshold(threshold=0.01)
-            print(len(X[0]))
-            X = sel.fit_transform(X)
-            print(len(X[0]))
-            poly = PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)
-            X = poly.fit_transform(X)
-            print(len(X[0]))
-            sel = VarianceThreshold(threshold=0.01)
-            X = sel.fit_transform(X)
-            print(len(X[0]))
-        y = np.array([usage.annotation_name for usage in method_usages])
-        return X, y, all_new_names
+        return load(method_usages, max_new_columns, size, train_fraction, state, need_polynomial)
