@@ -1,4 +1,4 @@
-from metric import Metric
+from metric.metric import Metric
 
 
 def calculate_and_print(X_train, X_test, y_train, y_test, model):
@@ -14,7 +14,7 @@ def calculate_and_print(X_train, X_test, y_train, y_test, model):
     print(f'Mean: {metric.mean}')
 
 
-def caclulate(X_train, X_test, y_train, y_test, model):
+def calculate(X_train, X_test, y_train, y_test, model):
     model.fit(X_train, y_train)
     predicted = model.predict(X_test)
     return Metric(predicted, y_test)

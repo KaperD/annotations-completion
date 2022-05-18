@@ -5,6 +5,7 @@ from collections import Counter
 class Baseline:
     def __init__(self):
         self.ordered_by_quantity = np.array([])
+        self.name = 'Baseline'
 
     def fit(self, X, y):
         self.ordered_by_quantity = np.array([x[0] for x in Counter(y).most_common()])

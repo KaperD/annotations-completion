@@ -4,7 +4,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import LinearSVC
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import LogisticRegression, RidgeClassifier
-from base import BaseMulticlassClassifier
+from models.base import BaseMulticlassClassifier
 
 
 class SVM(BaseMulticlassClassifier):
@@ -16,7 +16,7 @@ class SVM(BaseMulticlassClassifier):
         model = SVC(C=c, max_iter=max_iter, probability=True, kernel='linear')
         if need_scaler:
             model = make_pipeline(StandardScaler(), model)
-        super().__init__(model)
+        super().__init__(model, 'SVM')
 
 
 class LinearSVM(BaseMulticlassClassifier):
@@ -29,7 +29,7 @@ class LinearSVM(BaseMulticlassClassifier):
         if need_scaler:
             model = make_pipeline(StandardScaler(), model)
         model = CalibratedClassifierCV(model)
-        super().__init__(model)
+        super().__init__(model, 'Linear SVM')
 
 
 class LogisticReg(BaseMulticlassClassifier):
@@ -41,16 +41,5 @@ class LogisticReg(BaseMulticlassClassifier):
         model = LogisticRegression(C=c, max_iter=max_iter, solver=solver, n_jobs=-1)
         if need_scaler:
             model = make_pipeline(StandardScaler(), model)
-        super().__init__(model)
+        super().__init__(model, 'Logistic reg')
 
-
-class Ridge(BaseMulticlassClassifier):
-    """
-    Ridge for multiclass classification
-    """
-
-    def __init__(self, alpha=1, need_scaler=False):
-        model = RidgeClassifier(alpha=alpha)
-        if need_scaler:
-            model = make_pipeline(StandardScaler(), model)
-        super().__init__(model)

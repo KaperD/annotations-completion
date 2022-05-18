@@ -6,8 +6,9 @@ class BaseMulticlassClassifier:
     Model base for multiclass classification
     """
 
-    def __init__(self, model):
+    def __init__(self, model, name):
         self.model = model
+        self.name = name
 
     def fit(self, X, y):
         self.model.fit(X, y)

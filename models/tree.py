@@ -1,6 +1,6 @@
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from catboost import CatBoostClassifier
-from base import BaseMulticlassClassifier
+from models.base import BaseMulticlassClassifier
 
 
 class CatBoost(BaseMulticlassClassifier):
@@ -12,7 +12,7 @@ class CatBoost(BaseMulticlassClassifier):
         model = CatBoostClassifier(verbose=False,
                                    thread_count=-1,
                                    task_type=task_type)
-        super().__init__(model)
+        super().__init__(model, 'CatBoost')
 
 
 class RandomForest(BaseMulticlassClassifier):
@@ -22,7 +22,7 @@ class RandomForest(BaseMulticlassClassifier):
 
     def __init__(self, n_estimators=1000):
         model = RandomForestClassifier(n_estimators=n_estimators, n_jobs=-1)
-        super().__init__(model)
+        super().__init__(model, 'Random forest')
 
 
 class GradientBoosting(BaseMulticlassClassifier):
@@ -30,6 +30,6 @@ class GradientBoosting(BaseMulticlassClassifier):
     Gradient boosting for multiclass classification
     """
 
-    def __init__(self, n_estimators=1000):
+    def __init__(self, n_estimators=100):
         model = GradientBoostingClassifier(n_estimators=n_estimators)
-        super().__init__(model)
+        super().__init__(model, 'Gradient boosting')

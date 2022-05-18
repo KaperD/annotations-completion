@@ -1,11 +1,10 @@
 from matplotlib import pyplot as plt
-from utils.usage_loader import UsagesLoader, target_types
 from collections import Counter
 
 
 class Stats:
-    def __init__(self, processing_result_path):
-        self.usage_loader = UsagesLoader(processing_result_path)
+    def __init__(self, usage_loader):
+        self.usage_loader = usage_loader
 
     def number_of_annotation_by_target(self):
         number_of_usage = {}

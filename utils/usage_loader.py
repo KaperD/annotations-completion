@@ -58,11 +58,11 @@ class AnnotationUsage:
 
 
 def load(method_usages,
-           max_new_columns=100,
-           size=10000,
-           train_fraction=0.8,
-           state=42,
-           need_polynomial=False):
+         max_new_columns=100,
+         size=10000,
+         train_fraction=0.8,
+         state=42,
+         need_polynomial=False):
     method_usages = shuffle(method_usages, random_state=state)[:size]
     raw_X = np.array([np.array(usage.features_list, dtype=object) for usage in method_usages])
     X = None
@@ -97,19 +97,20 @@ def load(method_usages,
 
 
 class UsagesLoader:
-    def __init__(self, processing_result_path):
+    def __init__(self, processing_result_paths):
         usages_by_target = defaultdict(list)
-        for root, dirs, files in os.walk(processing_result_path):
-            for file in files:
-                if not file.endswith('json'):
-                    continue
-                with open(os.path.join(root, file), 'r') as read_file:
-                    data = json.load(read_file)
-                    target_type = data['keyInfo']['name']
-                    new_usages = [AnnotationUsage(usage_json) for usage_json in data["usages"]]
-                    for usage in new_usages:
-                        usage.features_list.append(target_type)
-                    usages_by_target[target_type] = usages_by_target[target_type] + new_usages
+        for path in processing_result_paths:
+            for root, dirs, files in os.walk(path):
+                for file in files:
+                    if not file.endswith('json'):
+                        continue
+                    with open(os.path.join(root, file), 'r') as read_file:
+                        data = json.load(read_file)
+                        target_type = data['keyInfo']['name']
+                        new_usages = [AnnotationUsage(usage_json) for usage_json in data["usages"]]
+                        for usage in new_usages:
+                            usage.features_list.append(target_type)
+                        usages_by_target[target_type] = usages_by_target[target_type] + new_usages
         self.usages_by_target = usages_by_target
 
     def load_all(self):
