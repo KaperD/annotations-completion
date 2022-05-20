@@ -57,14 +57,14 @@ class AnnotationUsage:
         return f'{self.annotation_name}'
 
 
-def load(method_usages,
+def load(usages,
          max_new_columns=100,
          size=10000,
          train_fraction=0.8,
          state=42,
          need_polynomial=False):
-    method_usages = shuffle(method_usages, random_state=state)[:size]
-    raw_X = np.array([np.array(usage.features_list, dtype=object) for usage in method_usages])
+    usages = shuffle(usages, random_state=state)[:size]
+    raw_X = np.array([np.array(usage.features_list, dtype=object) for usage in usages])
     X = None
     all_new_names = []
     if len(raw_X) == 0:
@@ -89,10 +89,10 @@ def load(method_usages,
         poly = PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)
         X = poly.fit_transform(X)
         print(len(X[0]))
-        sel = VarianceThreshold(threshold=0.01)
+        sel = VarianceThreshold(threshold=0.05)
         X = sel.fit_transform(X)
         print(len(X[0]))
-    y = np.array([usage.annotation_name for usage in method_usages])
+    y = np.array([usage.annotation_name for usage in usages])
     return X, y, all_new_names
 
 
@@ -126,8 +126,8 @@ class UsagesLoader:
              state=42,
              need_polynomial=False,
              ignored_annotation=()):
-        method_usages = list(filter(lambda x: x.annotation_name not in ignored_annotation, self.load_all()))
-        return load(method_usages, max_new_columns, size, train_fraction, state, need_polynomial)
+        usages = list(filter(lambda x: x.annotation_name not in ignored_annotation, self.load_all()))
+        return load(usages, max_new_columns, size, train_fraction, state, need_polynomial)
 
     def load_for_target(self,
                         target_type,
@@ -137,6 +137,6 @@ class UsagesLoader:
                         state=42,
                         need_polynomial=False,
                         ignored_annotation=()):
-        method_usages = list(
+        usages = list(
             filter(lambda x: x.annotation_name not in ignored_annotation, self.usages_by_target[target_type]))
-        return load(method_usages, max_new_columns, size, train_fraction, state, need_polynomial)
+        return load(usages, max_new_columns, size, train_fraction, state, need_polynomial)

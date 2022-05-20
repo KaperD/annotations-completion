@@ -2,6 +2,7 @@ from metric.metric import Metric
 
 
 def calculate_and_print(X_train, X_test, y_train, y_test, model):
+    print(model.name)
     model.fit(X_train, y_train)
     predicted = model.predict(X_test)
 
