@@ -3,15 +3,16 @@ import re
 from sklearn.feature_extraction.text import CountVectorizer
 
 
+def split_camel_case(x):
+    words = [word.lower() for word in re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)', x)]
+    return ' '.join(words)
+
+
 def encode_names(column, train_size, column_name, max_new_columns):
     """
     Converts column of camelCase names to 100 columns with most popular words
     with 1 (if name contains word) and 0 (otherwise)
     """
-
-    def split_camel_case(x):
-        words = [word.lower() for word in re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)', x)]
-        return ' '.join(words)
 
     vectorizer = CountVectorizer(preprocessor=split_camel_case, max_features=max_new_columns)
     vectorizer.fit(column[:train_size])
@@ -28,7 +29,7 @@ def encode_lists(column, train_size, column_name, max_new_columns):
 
     joined_words = np.array([' '.join(x).replace('.', '') for x in column])
 
-    vectorizer = CountVectorizer(max_features=max_new_columns)
+    vectorizer = CountVectorizer(preprocessor=split_camel_case, max_features=max_new_columns)
     vectorizer.fit(joined_words[:train_size])
     new_columns = vectorizer.transform(joined_words).toarray()
     new_names = [column_name + '_' + name for name in vectorizer.get_feature_names_out()]

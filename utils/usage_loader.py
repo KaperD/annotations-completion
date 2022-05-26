@@ -25,14 +25,17 @@ target_types = [
 initial_feature_names = [
     'targetName',
     'className',
-    'returnType',
-    'methodModifiers',
+    'targetType',
+    'modifiers',
     'otherAnnotations',
     'otherMethodsNames',
     'otherMethodsAnnotations',
     'returnsNull',
     'checksNull',
-    'targetType'
+    'fileName',
+    'otherParamsNames',
+    'otherParamsAnnotations',
+    'target'
 ]
 
 
@@ -43,13 +46,16 @@ class AnnotationUsage:
         self.features_list = [
             features_json.get('targetName', ''),
             features_json.get('className', ''),
-            features_json.get('returnType', ''),
-            features_json.get('methodModifiers', []),
+            features_json.get('targetType', ''),
+            features_json.get('modifiers', []),
             features_json.get('otherAnnotations', []),
             features_json.get('otherMethodsNames', []),
             features_json.get('otherMethodsAnnotations', []),
             1 if features_json.get('returnsNull', False) else 0,
             1 if features_json.get('checksNull', False) else 0,
+            features_json.get('fileName', ''),
+            features_json.get('otherParamsNames', []),
+            features_json.get('otherParamsAnnotations', []),
         ]
         self.file_path = usage_json['filePath']
 
