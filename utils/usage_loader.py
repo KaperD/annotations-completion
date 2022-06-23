@@ -35,6 +35,7 @@ initial_feature_names = [
     'fileName',
     'otherParamsNames',
     'otherParamsAnnotations',
+    'filePath',
     'target'
 ]
 
@@ -56,6 +57,7 @@ class AnnotationUsage:
             features_json.get('fileName', ''),
             features_json.get('otherParamsNames', []),
             features_json.get('otherParamsAnnotations', []),
+            usage_json['filePath'].split('/')
         ]
         self.file_path = usage_json['filePath']
 

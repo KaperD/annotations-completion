@@ -9,13 +9,15 @@ class CatBoost(BaseMulticlassClassifier):
     Boosting from CatBoost for multiclass classification
     """
 
-    def __init__(self, task_type='CPU', early_stopping_rounds=20, verbose=False, iterations=1000, learning_rate=None):
+    def __init__(self, task_type='CPU', early_stopping_rounds=20, verbose=False, iterations=1000, learning_rate=None, depth=6):
         model = CatBoostClassifier(verbose=verbose,
                                    thread_count=-1,
                                    task_type=task_type,
                                    early_stopping_rounds=early_stopping_rounds,
                                    iterations=iterations,
-                                   learning_rate=learning_rate)
+                                   learning_rate=learning_rate,
+                                   depth=depth)
+
         super().__init__(model, 'CatBoost')
 
     def fit(self, X, y):
